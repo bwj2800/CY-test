@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios'
+
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -28,18 +30,6 @@ const StyledTableRow = withStyles((theme) => ({
   },
 }))(TableRow);
 
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
-}
-
-const rows = [
-  createData('Frozen', 159, 6.0, 24, 4.0),
-  createData('Ice', 237, 9.0, 37, 4.3),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Ginger', 356, 16.0, 49, 3.9),
-];
-
 const useStyles = makeStyles({
   table: {
     minWidth: 700,
@@ -47,17 +37,25 @@ const useStyles = makeStyles({
 });
 
 export default function CustomizedTables() {
+  
   const classes = useStyles();
+  const [rows, setRows] = useState([]);
+
+  useEffect(() => {
+    axios.get('/api/customers')
+      .then(res => setRows(res.data))
+      .catch(err => console.log(err))
+  });
 
   return (
-    <TableContainer component={Paper}>
-      <Table className={classes.table} aria-label="customized table">
+    <TableContainer component={Paper} sx={{ maxHeight: 440, overflow: 'scroll'}}>
+      <Table stickyHeader className={classes.table} aria-label="customized table">
         <TableHead>
           <TableRow>
             <StyledTableCell>ID</StyledTableCell>
             <StyledTableCell>기업명</StyledTableCell>
             <StyledTableCell>홈페이지</StyledTableCell>
-            <StyledTableCell>전화번호</StyledTableCell>
+            <StyledTableCell>연락처</StyledTableCell>
             <StyledTableCell>대표</StyledTableCell>
             <StyledTableCell>수정</StyledTableCell>
             <StyledTableCell>삭제</StyledTableCell>
@@ -65,14 +63,14 @@ export default function CustomizedTables() {
         </TableHead>
         <TableBody>
           {rows.map((row) => (
-            <StyledTableRow key={row.name}>
+            <StyledTableRow key={row.id}>
               <StyledTableCell component="th" scope="row">
-                {row.name}
+                {row.id}
               </StyledTableCell>
-              <StyledTableCell>{row.calories}</StyledTableCell>
-              <StyledTableCell>{row.fat}</StyledTableCell>
-              <StyledTableCell>{row.carbs}</StyledTableCell>
-              <StyledTableCell>{row.protein}</StyledTableCell>
+              <StyledTableCell>{row.name}</StyledTableCell>
+              <StyledTableCell>{row.website}</StyledTableCell>
+              <StyledTableCell>{row.contact}</StyledTableCell>
+              <StyledTableCell>{row.owner}</StyledTableCell>
               <StyledTableCell><Edit/></StyledTableCell>
               <StyledTableCell><Delete/></StyledTableCell>
             </StyledTableRow>
